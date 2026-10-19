@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or usage help
+    url: https://github.com/francesco-plt/tecnocasa-mcp/discussions
+    about: Ask in Discussions instead of opening an issue.
+  - name: Upstream outage / blocked requests
+    url: https://github.com/francesco-plt/tecnocasa-mcp/blob/main/docs/troubleshooting.md
+    about: Check the troubleshooting guide first.

@@ -1,0 +1,25 @@
+name: Feature request
+description: Suggest a tool, filter, or improvement
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you trying to solve?
+      description: Describe the task, not the implementation.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Tool name, parameters, expected output.
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: markdown
+    attributes:
+      value: |
+        Note: changes that increase request volume, bypass rate limits, or add
+        write/authentication behaviour will not be accepted.

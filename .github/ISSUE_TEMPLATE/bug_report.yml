@@ -1,0 +1,72 @@
+name: Bug report
+description: Something is not working as documented
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before filing: upstream outages (502s, timeouts, WAF blocks) are not
+        bugs in this server. Try `aggregate_listings`, and check
+        [docs/troubleshooting.md](https://github.com/francesco-plt/tecnocasa-mcp/blob/main/docs/troubleshooting.md).
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Output of `tecnocasa-mcp --version`
+      placeholder: tecnocasa-mcp 0.1.0
+    validations:
+      required: true
+  - type: dropdown
+    id: install
+    attributes:
+      label: How did you install it?
+      options:
+        - uvx
+        - pipx
+        - pip
+        - Docker
+        - cloned the repository
+        - other
+    validations:
+      required: true
+  - type: dropdown
+    id: client
+    attributes:
+      label: MCP client
+      options:
+        - Claude Code
+        - Claude Desktop
+        - Cursor
+        - VS Code
+        - OpenCode
+        - Windsurf
+        - other
+    validations:
+      required: true
+  - type: input
+    id: tool
+    attributes:
+      label: Tool
+      description: Which tool was called?
+      placeholder: search_listings
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Include the arguments you passed and the exact error.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Server logs
+      description: Sanitized stderr output. Remove any tokens or personal paths.
+      render: shell
