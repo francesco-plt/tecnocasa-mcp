@@ -14,7 +14,8 @@ import random
 import re
 import time
 import unicodedata
-from typing import Any, Iterable, Literal, Sequence
+from collections.abc import Iterable, Sequence
+from typing import Any, Literal
 from urllib.parse import urlparse
 
 import httpx
@@ -85,12 +86,36 @@ TYPE_MAP = {
 
 PROPERTY_TYPE_TERMS = {
     "apartment": [
-        "appartament", "bilocale", "trilocale", "monolocale", "quadrilocale",
-        "attico", "loft", "penthouse", "mansarda", "locale",
+        "appartament",
+        "bilocale",
+        "trilocale",
+        "monolocale",
+        "quadrilocale",
+        "attico",
+        "loft",
+        "penthouse",
+        "mansarda",
+        "locale",
     ],
-    "house": ["villa", "ville", "casa", "casale", "rustico", "villetta", "schiera", "indipendente"],
+    "house": [
+        "villa",
+        "ville",
+        "casa",
+        "casale",
+        "rustico",
+        "villetta",
+        "schiera",
+        "indipendente",
+    ],
     "garage": ["box", "posto auto", "garage", "autorimessa", "parcheggio"],
-    "commercial": ["negozio", "ufficio", "magazzino", "capannone", "commerciale", "laboratorio"],
+    "commercial": [
+        "negozio",
+        "ufficio",
+        "magazzino",
+        "capannone",
+        "commerciale",
+        "laboratorio",
+    ],
     "land": ["terreno", "terreni"],
     "room": ["stanza", "camera", "posto letto"],
 }
@@ -164,7 +189,9 @@ def normalize_text(value: Any) -> str:
 def strip_html(value: Any) -> str:
     if not value:
         return ""
-    return re.sub(r"\s+", " ", BeautifulSoup(str(value), "html.parser").get_text(" ", strip=True)).strip()
+    return re.sub(
+        r"\s+", " ", BeautifulSoup(str(value), "html.parser").get_text(" ", strip=True)
+    ).strip()
 
 
 def parse_number(value: Any) -> float | None:
@@ -292,7 +319,9 @@ def normalize_summary(item: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def normalize_estate(estate: dict[str, Any], summary: dict[str, Any] | None = None) -> dict[str, Any]:
+def normalize_estate(
+    estate: dict[str, Any], summary: dict[str, Any] | None = None
+) -> dict[str, Any]:
     summary = summary or {}
     data_rows = estate.get("data") or []
     details: dict[str, Any] = {}
@@ -325,10 +354,20 @@ def normalize_estate(estate: dict[str, Any], summary: dict[str, Any] | None = No
     if not images and summary.get("image"):
         images = [summary["image"]]
 
-    price_value = to_int(estate.get("numeric_price")) or parse_price(estate.get("price")) or summary.get("price_value")
-    surface_value = to_int(estate.get("numeric_surface")) or parse_surface(estate.get("surface")) or summary.get("surface_value")
+    price_value = (
+        to_int(estate.get("numeric_price"))
+        or parse_price(estate.get("price"))
+        or summary.get("price_value")
+    )
+    surface_value = (
+        to_int(estate.get("numeric_surface"))
+        or parse_surface(estate.get("surface"))
+        or summary.get("surface_value")
+    )
     rooms_value = parse_rooms(estate.get("rooms")) or summary.get("rooms_value")
-    bathrooms_value = parse_bathrooms(estate.get("bathrooms") or details.get("Bagni")) or summary.get("bathrooms_value")
+    bathrooms_value = parse_bathrooms(
+        estate.get("bathrooms") or details.get("Bagni")
+    ) or summary.get("bathrooms_value")
     bedrooms_value = features.get("bedrooms") or to_int(details.get("Camere da letto"))
 
     return {
@@ -354,7 +393,9 @@ def normalize_estate(estate: dict[str, Any], summary: dict[str, Any] | None = No
         "region": region.get("title") if isinstance(region, dict) else region,
         "contract": contract.get("title") if isinstance(contract, dict) else contract,
         "sector": sector.get("title") if isinstance(sector, dict) else sector,
-        "property_type": prop_type.get("title") if isinstance(prop_type, dict) else prop_type,
+        "property_type": prop_type.get("title")
+        if isinstance(prop_type, dict)
+        else prop_type,
         "energy_class": (energy.get("class") or "").upper() or None,
         "expenses": costs.get("expenses"),
         "floor": features.get("floor"),
@@ -376,14 +417,17 @@ def normalize_estate(estate: dict[str, Any], summary: dict[str, Any] | None = No
         },
         "description": strip_html(estate.get("description")),
         "description_html": estate.get("description"),
-        "agency": normalize_agency(estate.get("agency")) or normalize_agency(summary.get("agency")),
+        "agency": normalize_agency(estate.get("agency"))
+        or normalize_agency(summary.get("agency")),
         "images": images,
         "coordinates": {
             "lat": estate.get("latitude"),
             "lon": estate.get("longitude"),
         },
         "published_at": estate.get("last_published_at"),
-        "exclusive": estate.get("exclusive") if estate.get("exclusive") is not None else summary.get("exclusive"),
+        "exclusive": estate.get("exclusive")
+        if estate.get("exclusive") is not None
+        else summary.get("exclusive"),
         "url": estate.get("detail_url") or summary.get("detail_url"),
         "details": details,
     }
@@ -460,7 +504,9 @@ def parse_estate_html(page: str) -> dict[str, Any]:
     return estate
 
 
-def parse_microsite_cards(page: str, base_url: str) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+def parse_microsite_cards(
+    page: str, base_url: str
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     """Parse franchise microsite listing cards.
 
     Returns (cards, meta) where meta contains agency/title information.
@@ -487,7 +533,9 @@ def parse_microsite_cards(page: str, base_url: str) -> tuple[list[dict[str, Any]
                 "agency_id": card.get("agenziaid") or card.get("agenziaId"),
                 "detail_url": httpx.URL(base_url).join(link.get("href")).__str__(),
                 "title": title_el.get_text(" ", strip=True) if title_el else None,
-                "subtitle": subtitle_el.get_text(" ", strip=True) if subtitle_el else None,
+                "subtitle": subtitle_el.get_text(" ", strip=True)
+                if subtitle_el
+                else None,
                 "price": price,
                 "price_value": parse_price(price),
                 "surface_value": parse_surface(data_text),
@@ -497,7 +545,9 @@ def parse_microsite_cards(page: str, base_url: str) -> tuple[list[dict[str, Any]
         )
 
     agency_name = title.split(" - ")[0].strip() if title else None
-    agency_id = next((card.get("agency_id") for card in cards if card.get("agency_id")), None)
+    agency_id = next(
+        (card.get("agency_id") for card in cards if card.get("agency_id")), None
+    )
     area_links: list[str] = []
     origin = f"{urlparse(canonical_url).scheme}://{urlparse(canonical_url).netloc}"
     for anchor in soup.select("a[href]"):
@@ -508,7 +558,9 @@ def parse_microsite_cards(page: str, base_url: str) -> tuple[list[dict[str, Any]
         if not absolute.startswith(origin):
             continue
         path = urlparse(absolute).path
-        if any(path.startswith(prefix) for prefix in ("/web/", "/privacy/", "/controller")):
+        if any(
+            path.startswith(prefix) for prefix in ("/web/", "/privacy/", "/controller")
+        ):
             continue
         if absolute not in area_links:
             area_links.append(absolute)
@@ -534,7 +586,10 @@ def parse_microsite_agency(page: str) -> dict[str, Any]:
         if candidate and not candidate.startswith("#") and len(candidate) <= 80:
             name = candidate
     phone = next(
-        (anchor.get("href", "")[4:].strip() for anchor in soup.select('a[href^="tel:"]')),
+        (
+            anchor.get("href", "")[4:].strip()
+            for anchor in soup.select('a[href^="tel:"]')
+        ),
         None,
     )
     email = next(
@@ -616,7 +671,9 @@ def filter_listings(
         key = normalize_text(property_type)
         terms = PROPERTY_TYPE_TERMS.get(key, [key])
 
-    area_terms = [term for term in (normalize_text(value) for value in areas or []) if term]
+    area_terms = [
+        term for term in (normalize_text(value) for value in areas or []) if term
+    ]
 
     def number_ok(value: Any, minimum: int | None, maximum: int | None) -> bool:
         if minimum is None and maximum is None:
@@ -670,17 +727,59 @@ def sort_listings(listings: list[dict[str, Any]], sort: str) -> list[dict[str, A
     if sort == "relevance":
         return listings
     if sort == "price_asc":
-        return sorted(listings, key=lambda x: (x.get("price_value") is None, x.get("price_value") or 0, x.get("id") or 0))
+        return sorted(
+            listings,
+            key=lambda x: (
+                x.get("price_value") is None,
+                x.get("price_value") or 0,
+                x.get("id") or 0,
+            ),
+        )
     if sort == "price_desc":
-        return sorted(listings, key=lambda x: (x.get("price_value") is None, -(x.get("price_value") or 0), x.get("id") or 0))
+        return sorted(
+            listings,
+            key=lambda x: (
+                x.get("price_value") is None,
+                -(x.get("price_value") or 0),
+                x.get("id") or 0,
+            ),
+        )
     if sort == "sqm_asc":
-        return sorted(listings, key=lambda x: (x.get("surface_value") is None, x.get("surface_value") or 0, x.get("id") or 0))
+        return sorted(
+            listings,
+            key=lambda x: (
+                x.get("surface_value") is None,
+                x.get("surface_value") or 0,
+                x.get("id") or 0,
+            ),
+        )
     if sort == "sqm_desc":
-        return sorted(listings, key=lambda x: (x.get("surface_value") is None, -(x.get("surface_value") or 0), x.get("id") or 0))
+        return sorted(
+            listings,
+            key=lambda x: (
+                x.get("surface_value") is None,
+                -(x.get("surface_value") or 0),
+                x.get("id") or 0,
+            ),
+        )
     if sort == "rooms_asc":
-        return sorted(listings, key=lambda x: (x.get("rooms_value") is None, x.get("rooms_value") or 0, x.get("id") or 0))
+        return sorted(
+            listings,
+            key=lambda x: (
+                x.get("rooms_value") is None,
+                x.get("rooms_value") or 0,
+                x.get("id") or 0,
+            ),
+        )
     if sort == "rooms_desc":
-        return sorted(listings, key=lambda x: (x.get("rooms_value") is None, -(x.get("rooms_value") or 0), x.get("id") or 0))
+        return sorted(
+            listings,
+            key=lambda x: (
+                x.get("rooms_value") is None,
+                -(x.get("rooms_value") or 0),
+                x.get("id") or 0,
+            ),
+        )
     return listings
 
 
@@ -719,7 +818,9 @@ def build_search_params(
     if province:
         params.append(("province", province))
     if district_ids:
-        params.append(("districts", "|".join(str(int(value)) for value in district_ids)))
+        params.append(
+            ("districts", "|".join(str(int(value)) for value in district_ids))
+        )
     if quarter_ids:
         params.append(("quarters", "|".join(str(int(value)) for value in quarter_ids)))
     for name, value in (
@@ -922,7 +1023,10 @@ class TecnocasaClient:
                         raise TecnocasaNotFound(f"Not found: {path}")
                     else:
                         retry_after = self._retry_after_seconds(response)
-                        if retry_after is not None and retry_after > API_ATTEMPTS * API_TIMEOUT:
+                        if (
+                            retry_after is not None
+                            and retry_after > API_ATTEMPTS * API_TIMEOUT
+                        ):
                             self._cooldown_until = time.monotonic() + retry_after
                             raise TecnocasaError(
                                 "Tecnocasa asked this client to retry in about "
@@ -998,7 +1102,9 @@ class TecnocasaClient:
 
     # -- API methods -----------------------------------------------------
 
-    async def autocomplete(self, query: str, section: str = "estate") -> list[dict[str, Any]]:
+    async def autocomplete(
+        self, query: str, section: str = "estate"
+    ) -> list[dict[str, Any]]:
         data = await self._get_json(
             "/api/geo/autocomplete",
             {"search": query, "section": section},
@@ -1088,7 +1194,9 @@ class TecnocasaClient:
             raise TecnocasaError("Unexpected search response")
         return data
 
-    async def details(self, ids: Sequence[int], section: str = "estate") -> list[dict[str, Any]]:
+    async def details(
+        self, ids: Sequence[int], section: str = "estate"
+    ) -> list[dict[str, Any]]:
         clean_ids = [int(value) for value in ids if value is not None]
         if not clean_ids:
             return []
@@ -1097,7 +1205,9 @@ class TecnocasaClient:
         data = await self._get_json("/api/estates/search-by-ids", params, ttl=1800)
         return data if isinstance(data, list) else []
 
-    async def summaries(self, ids: Sequence[int], ttl: float = 1800.0) -> list[dict[str, Any]]:
+    async def summaries(
+        self, ids: Sequence[int], ttl: float = 1800.0
+    ) -> list[dict[str, Any]]:
         """Return raw summaries for `ids`, fetching only the missing ones.
 
         Summaries are cached per listing rather than per batch, so pagination,
@@ -1154,7 +1264,9 @@ class TecnocasaClient:
 
     # -- High-level resolution / search ----------------------------------
 
-    async def resolve_location(self, query: str, city_hint: str | None = None) -> dict[str, Any]:
+    async def resolve_location(
+        self, query: str, city_hint: str | None = None
+    ) -> dict[str, Any]:
         attempts: list[tuple[str, str | None]] = [(query, city_hint)]
         if "," in query:
             left, right = [part.strip() for part in query.split(",", 1)]
@@ -1410,7 +1522,9 @@ class TecnocasaClient:
             for item in items
         ]
 
-    async def get_listing(self, property_id: int, summary: dict[str, Any] | None = None) -> dict[str, Any]:
+    async def get_listing(
+        self, property_id: int, summary: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         if summary is None:
             summaries = await self.summaries([property_id])
             if not summaries:
@@ -1455,7 +1569,11 @@ class TecnocasaClient:
         origin = f"{parsed.scheme}://{parsed.netloc}"
         if scope == "agency":
             contract_code = CONTRACT_MAP.get(contract.lower(), contract)
-            path = "/immobili-in-vendita" if contract_code == "acquis" else "/immobili-in-affitto"
+            path = (
+                "/immobili-in-vendita"
+                if contract_code == "acquis"
+                else "/immobili-in-affitto"
+            )
             target = origin + path
         else:
             target = url
@@ -1475,7 +1593,9 @@ class TecnocasaClient:
             try:
                 summaries = await self.summaries(ids)
             except TecnocasaError as exc:
-                enrichment_notice = f"Could not enrich listings from the national API: {exc}"
+                enrichment_notice = (
+                    f"Could not enrich listings from the national API: {exc}"
+                )
         by_id = {to_int(item.get("id")): normalize_summary(item) for item in summaries}
 
         listings: list[dict[str, Any]] = []
@@ -1497,7 +1617,9 @@ class TecnocasaClient:
                 }
             else:
                 listing["agency_id"] = listing.get("agency_id") or card.get("agency_id")
-                listing["detail_url"] = listing.get("detail_url") or card.get("detail_url")
+                listing["detail_url"] = listing.get("detail_url") or card.get(
+                    "detail_url"
+                )
             listings.append(listing)
 
         filtered = filter_listings(
@@ -1536,10 +1658,18 @@ class TecnocasaClient:
                         continue
                     merged = {
                         **item,
-                        **{key: value for key, value in enriched.items() if value is not None},
+                        **{
+                            key: value
+                            for key, value in enriched.items()
+                            if value is not None
+                        },
                     }
-                    merged["agency_id"] = item.get("agency_id") or enriched.get("agency_id")
-                    merged["detail_url"] = item.get("detail_url") or enriched.get("detail_url")
+                    merged["agency_id"] = item.get("agency_id") or enriched.get(
+                        "agency_id"
+                    )
+                    merged["detail_url"] = item.get("detail_url") or enriched.get(
+                        "detail_url"
+                    )
                     page_items[index] = merged
 
         notices: list[str] = []
@@ -1552,7 +1682,9 @@ class TecnocasaClient:
             )
         pagination = re.findall(r'href="[^"]*(?:pagina|page)=', page, re.I)
         if pagination:
-            notices.append("The microsite page appears paginated; only page 1 was read.")
+            notices.append(
+                "The microsite page appears paginated; only page 1 was read."
+            )
 
         return {
             "source_url": target,
@@ -1574,7 +1706,9 @@ class TecnocasaClient:
 
     # -- Franchise microsite discovery / aggregation ---------------------
 
-    async def _probe_microsite(self, host: str, refresh: bool = False) -> dict[str, Any]:
+    async def _probe_microsite(
+        self, host: str, refresh: bool = False
+    ) -> dict[str, Any]:
         """Check whether a numbered franchise subdomain is live.
 
         A live microsite answers its root either directly (200) or with a
@@ -1675,7 +1809,11 @@ class TecnocasaClient:
         self, host: str, contract: str, refresh: bool = False
     ) -> str:
         contract_code = CONTRACT_MAP.get(contract.lower(), contract)
-        path = "/immobili-in-vendita" if contract_code == "acquis" else "/immobili-in-affitto"
+        path = (
+            "/immobili-in-vendita"
+            if contract_code == "acquis"
+            else "/immobili-in-affitto"
+        )
         url = f"https://{host}{path}"
         key = "microsite:" + url
 
@@ -1855,6 +1993,8 @@ class TecnocasaClient:
                 "area_url": meta.get("area_url"),
             },
             "title": meta.get("title"),
-            "listing_ids_on_page": [card["id"] for card in cards if card.get("id") is not None],
+            "listing_ids_on_page": [
+                card["id"] for card in cards if card.get("id") is not None
+            ],
             "area_links": meta.get("area_links") or [],
         }

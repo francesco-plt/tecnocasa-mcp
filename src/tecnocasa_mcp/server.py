@@ -7,11 +7,13 @@ franchise microsites. No API key required.
 from __future__ import annotations
 
 import logging
+import sys
 from typing import Literal
 
 from mcp.server.fastmcp import FastMCP
 
-from tecnocasa import TecnocasaClient, TecnocasaError
+from . import __version__
+from .client import TecnocasaClient, TecnocasaError
 
 # FastMCP configures INFO logging; httpx then logs every request, which floods
 # the client's stderr for aggregate_listings (100+ requests).
@@ -343,6 +345,9 @@ async def get_franchise_agency(url: str) -> dict:
 
 
 def main() -> None:
+    if "--version" in sys.argv[1:] or "-V" in sys.argv[1:]:
+        print(f"tecnocasa-mcp {__version__}")
+        return
     mcp.run()
 
 

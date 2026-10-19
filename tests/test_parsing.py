@@ -1,7 +1,7 @@
 import json
 import unittest
 
-from tecnocasa import (
+from tecnocasa_mcp.client import (
     card_to_listing,
     dedupe_listings,
     filter_listings,
@@ -77,13 +77,38 @@ class ParsingTests(unittest.TestCase):
 
     def test_filters_and_sort(self):
         listings = [
-            {"id": 1, "title": "Bilocale", "price_value": 300000, "surface_value": 50, "rooms_value": 2, "agency_id": "a"},
-            {"id": 2, "title": "Box", "price_value": 50000, "surface_value": 15, "rooms_value": None, "agency_id": "b"},
-            {"id": 3, "title": "Trilocale", "price_value": 450000, "surface_value": 80, "rooms_value": 3, "agency_id": "a"},
+            {
+                "id": 1,
+                "title": "Bilocale",
+                "price_value": 300000,
+                "surface_value": 50,
+                "rooms_value": 2,
+                "agency_id": "a",
+            },
+            {
+                "id": 2,
+                "title": "Box",
+                "price_value": 50000,
+                "surface_value": 15,
+                "rooms_value": None,
+                "agency_id": "b",
+            },
+            {
+                "id": 3,
+                "title": "Trilocale",
+                "price_value": 450000,
+                "surface_value": 80,
+                "rooms_value": 3,
+                "agency_id": "a",
+            },
         ]
-        filtered = filter_listings(listings, min_price=100000, max_price=500000, min_rooms=2)
+        filtered = filter_listings(
+            listings, min_price=100000, max_price=500000, min_rooms=2
+        )
         self.assertEqual([x["id"] for x in filtered], [1, 3])
-        self.assertEqual([x["id"] for x in sort_listings(filtered, "price_desc")], [3, 1])
+        self.assertEqual(
+            [x["id"] for x in sort_listings(filtered, "price_desc")], [3, 1]
+        )
 
     def test_parse_estate_html(self):
         payload = {
@@ -115,7 +140,9 @@ class ParsingTests(unittest.TestCase):
         </div>
         </body></html>
         """
-        cards, meta = parse_microsite_cards(page, "https://milano34.tecnocasa.it/milano/porta-venezia-quadrilatero/")
+        cards, meta = parse_microsite_cards(
+            page, "https://milano34.tecnocasa.it/milano/porta-venezia-quadrilatero/"
+        )
         self.assertEqual(len(cards), 1)
         self.assertEqual(cards[0]["id"], 61279557)
         self.assertEqual(cards[0]["agency_id"], "micc4")
@@ -127,7 +154,9 @@ class ParsingTests(unittest.TestCase):
             split_subtitle("Milano, Via Kramer 31 - Porta Venezia"),
             ("Milano, Via Kramer 31", "Porta Venezia"),
         )
-        self.assertEqual(split_subtitle("Milano, Via Kramer"), ("Milano, Via Kramer", None))
+        self.assertEqual(
+            split_subtitle("Milano, Via Kramer"), ("Milano, Via Kramer", None)
+        )
         self.assertEqual(split_subtitle(None), ("", None))
 
     def test_card_to_listing(self):
@@ -162,9 +191,17 @@ class ParsingTests(unittest.TestCase):
 
     def test_filter_listings_by_area(self):
         listings = [
-            {"id": 1, "subtitle": "Milano, Via Rosolino Pilo - Porta Venezia", "area": "Porta Venezia"},
+            {
+                "id": 1,
+                "subtitle": "Milano, Via Rosolino Pilo - Porta Venezia",
+                "area": "Porta Venezia",
+            },
             {"id": 2, "subtitle": "Milano, Via Kramer", "area": None},
-            {"id": 3, "subtitle": "Milano, Via Vitruvio - Buenos Aires", "area": "Buenos Aires"},
+            {
+                "id": 3,
+                "subtitle": "Milano, Via Vitruvio - Buenos Aires",
+                "area": "Buenos Aires",
+            },
         ]
         filtered = filter_listings(listings, areas=["porta venezia", "Indipendenza"])
         self.assertEqual([item["id"] for item in filtered], [1])

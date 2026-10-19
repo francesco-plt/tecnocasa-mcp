@@ -2,7 +2,7 @@ import asyncio
 import time
 import unittest
 
-from tecnocasa import (
+from tecnocasa_mcp.client import (
     BATCH_SIZE,
     ENRICH_CONCURRENCY,
     MAX_SEARCH_LIMIT,
