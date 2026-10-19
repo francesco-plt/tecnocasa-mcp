@@ -1,6 +1,8 @@
 # Tecnocasa MCP — Accessibility & Growth Plan
 
-Working document. Not intended to ship: delete or move to a GitHub Project once Phase 7 is done.
+Working document for maintainers. Phases 0–6 are applied in the initial
+release; Phase 7 has its own step-by-step guide in
+[docs/DISTRIBUTION.md](docs/DISTRIBUTION.md).
 
 **Goal:** anyone can install and run this in under 60 seconds without reading source, the repo looks maintained, and it is discoverable wherever people look for MCP servers.
 
