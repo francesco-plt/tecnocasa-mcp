@@ -1,0 +1,23 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.francesco-plt/tecnocasa-mcp",
+  "title": "Tecnocasa",
+  "description": "Browse and filter Tecnocasa real-estate listings across Italy, including franchise microsites.",
+  "repository": {
+    "url": "https://github.com/francesco-plt/tecnocasa-mcp",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "registryBaseUrl": "https://pypi.org",
+      "identifier": "tecnocasa-mcp",
+      "version": "0.1.0",
+      "runtimeHint": "uvx",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}
