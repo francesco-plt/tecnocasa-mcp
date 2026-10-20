@@ -4,6 +4,10 @@ updates:
     directory: "/"
     schedule:
       interval: weekly
+    # mcp 2.x renames FastMCP to MCPServer; revisit after the v2 migration.
+    ignore:
+      - dependency-name: "mcp"
+        update-types: ["version-update:semver-major"]
     groups:
       python-dependencies:
         patterns: ["*"]
