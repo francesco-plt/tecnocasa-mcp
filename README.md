@@ -16,6 +16,8 @@
 
 <!-- mcp-name: io.github.francesco-plt/tecnocasa-mcp -->
 
+[![M8ven Score](https://m8ven.ai/badge/mcp/francesco-plt-tecnocasa-mcp-1f0jxm?v=387290517d7051460c2cb673492b25b4)](https://m8ven.ai/mcp/francesco-plt-tecnocasa-mcp-1f0jxm?s=readme)
+
 **Ask your assistant for Tecnocasa listings anywhere in Italy — sales, rentals,
 prices, sizes, rooms and the local franchise agency that publishes each one.**
 No API key, no account, read-only, stdio transport.
